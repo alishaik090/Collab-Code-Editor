@@ -6,15 +6,13 @@ const app = express();
 const server = createServer(app);
 
 const io = new Server(server, {
-    cors: {
-        origin: "*",
-    },
+    cors: { origin: "*" },
 });
 
 const rooms = {};
 
 io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+    console.log("Connected:", socket.id);
 
     socket.on("join-room", ({ roomId, name, role }) => {
         socket.join(roomId);
@@ -32,42 +30,27 @@ io.on("connection", (socket) => {
             canEdit: role === "host",
         };
 
-        // Notify everyone
-        io.to(roomId).emit("system-message", {
-            id: Date.now().toString(),
-            sender: "System",
-            content: `${name} joined the room`,
-            type: "system",
-            timestamp: Date.now(),
-        });
-
-        io.to(roomId).emit("member-list", rooms[roomId].members);
-
-        // Send existing code to new member
         socket.emit("code-update", rooms[roomId].code);
+        io.to(roomId).emit("member-list", rooms[roomId].members);
     });
 
     socket.on("code-change", ({ roomId, code }) => {
-        if (!rooms[roomId]) return;
-        rooms[roomId].code = code;
+        const room = rooms[roomId];
+        if (!room) return;
+
+        const user = room.members[socket.id];
+        if (!user || !user.canEdit) return;
+
+        room.code = code;
         socket.to(roomId).emit("code-update", code);
     });
 
-    socket.on("send-message", ({ roomId, message }) => {
-        io.to(roomId).emit("new-message", message);
-    });
-
     socket.on("request-edit", ({ roomId }) => {
-        const user = rooms[roomId]?.members[socket.id];
-        if (!user) return;
+        const room = rooms[roomId];
+        if (!room) return;
 
-        io.to(roomId).emit("system-message", {
-            id: Date.now().toString(),
-            sender: "System",
-            content: `${user.name} requested edit access`,
-            type: "system",
-            timestamp: Date.now(),
-        });
+        const user = room.members[socket.id];
+        if (!user) return;
 
         io.to(roomId).emit("edit-request", {
             socketId: socket.id,
@@ -76,58 +59,46 @@ io.on("connection", (socket) => {
     });
 
     socket.on("approve-edit", ({ roomId, socketId }) => {
-        if (!rooms[roomId]) return;
+        const room = rooms[roomId];
+        if (!room) return;
 
-        rooms[roomId].members[socketId].canEdit = true;
+        const approver = room.members[socket.id];
+        if (!approver || approver.role !== "host") return;
 
-        io.to(roomId).emit("system-message", {
-            id: Date.now().toString(),
-            sender: "System",
-            content: `${rooms[roomId].members[socketId].name} was granted edit access`,
-            type: "system",
-            timestamp: Date.now(),
-        });
+        if (!room.members[socketId]) return;
 
-        io.to(roomId).emit("member-list", rooms[roomId].members);
+        room.members[socketId].canEdit = true;
+        io.to(roomId).emit("member-list", room.members);
     });
 
     socket.on("revoke-edit", ({ roomId, socketId }) => {
-        if (!rooms[roomId]) return;
+        const room = rooms[roomId];
+        if (!room) return;
 
-        rooms[roomId].members[socketId].canEdit = false;
+        const approver = room.members[socket.id];
+        if (!approver || approver.role !== "host") return;
 
-        io.to(roomId).emit("system-message", {
-            id: Date.now().toString(),
-            sender: "System",
-            content: `${rooms[roomId].members[socketId].name}'s edit access was revoked`,
-            type: "system",
-            timestamp: Date.now(),
-        });
+        if (!room.members[socketId]) return;
 
-        io.to(roomId).emit("member-list", rooms[roomId].members);
+        room.members[socketId].canEdit = false;
+        io.to(roomId).emit("member-list", room.members);
+    });
+
+    socket.on("send-message", ({ roomId, message }) => {
+        io.to(roomId).emit("new-message", message);
     });
 
     socket.on("disconnect", () => {
         for (const roomId in rooms) {
-            if (rooms[roomId].members[socket.id]) {
-                const name = rooms[roomId].members[socket.id].name;
-
-                delete rooms[roomId].members[socket.id];
-
-                io.to(roomId).emit("system-message", {
-                    id: Date.now().toString(),
-                    sender: "System",
-                    content: `${name} left the room`,
-                    type: "system",
-                    timestamp: Date.now(),
-                });
-
-                io.to(roomId).emit("member-list", rooms[roomId].members);
+            const room = rooms[roomId];
+            if (room.members[socket.id]) {
+                delete room.members[socket.id];
+                io.to(roomId).emit("member-list", room.members);
             }
         }
     });
 });
 
 server.listen(3001, () => {
-    console.log("Server running on port 3001");
+    console.log("Server running on 3001");
 });
