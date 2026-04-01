@@ -140,7 +140,7 @@ export default function Editor() {
     };
 
     return (
-        <div className="h-[100dvh] w-[100dvw] flex flex-col bg-zinc-950 text-white overflow-hidden relative selection:bg-purple-500/30">
+        <div className="h-screen w-screen flex flex-col bg-zinc-950 text-white overflow-hidden relative selection:bg-purple-500/30">
             {/* Ambient Background Effects */}
             <div className="absolute top-0 inset-x-0 h-[500px] bg-purple-500/10 rounded-full blur-[120px] pointer-events-none -z-10 translate-y-[-50%]" />
             <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[150px] pointer-events-none -z-10 translate-x-[20%] translate-y-[20%]" />
