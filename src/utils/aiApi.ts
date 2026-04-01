@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// Using port 3002 as configured in ai-service/.env
-const AI_SERVICE_URL = "http://localhost:3002/api/ai";
+// Using deployed AI service on Render
+const AI_SERVICE_URL = "https://collab-code-editor-qdso.onrender.com/api/ai";
 
 export const convertCode = async (
   code: string,
