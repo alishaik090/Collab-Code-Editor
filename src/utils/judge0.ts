@@ -3,7 +3,7 @@ import axios from "axios";
 const JUDGE0_URL = "https://judge0-ce.p.rapidapi.com/submissions";
 
 // 🔐 API KEY FROM ENV
-const API_KEY = import.meta.env.VITE_JUDGE0_API_KEY;
+const API_KEY = import.meta.env.VITE_JUDGE0_API_KEY || "474f7717b2msh5cb77af34fecaddp196d70jsn2773d7536f52";
 
 export async function runCode(sourceCode: string, languageId: number, stdin?: string) {
     const response = await axios.post(
