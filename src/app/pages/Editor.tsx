@@ -110,6 +110,13 @@ export default function Editor() {
                 result.stdout ||
                 "✔ Executed"
             );
+        } catch (error: any) {
+            console.error("Execution error:", error);
+            setOutput(
+                error.response?.data?.message || 
+                error.message || 
+                "Error connecting to Judge0 compiler. Please verify API keys and network."
+            );
         } finally {
             setLoading(false);
         }
