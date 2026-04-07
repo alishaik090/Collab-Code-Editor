@@ -17,10 +17,12 @@ type Props = {
 
 export default function ChatBox({ messages, onSend, currentUser }: Props) {
   const [input, setInput] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const handleSend = () => {
@@ -41,7 +43,10 @@ export default function ChatBox({ messages, onSend, currentUser }: Props) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-sm custom-scrollbar bg-gradient-to-b from-transparent to-black/20">
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4 text-sm custom-scrollbar bg-gradient-to-b from-transparent to-black/20"
+      >
         {messages.slice(-50).map((msg) => {
           const isMe = msg.sender === currentUser;
           return (
@@ -63,7 +68,6 @@ export default function ChatBox({ messages, onSend, currentUser }: Props) {
             </div>
           );
         })}
-        <div ref={endRef} />
       </div>
 
       {/* Input */}
@@ -75,6 +79,7 @@ export default function ChatBox({ messages, onSend, currentUser }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onBlur={() => window.scrollTo(0, 0)}
           />
           <button
             className="absolute right-1.5 bg-purple-600/90 hover:bg-purple-500 text-white p-2 rounded-full shadow-md transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100"

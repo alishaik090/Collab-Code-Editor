@@ -36,7 +36,7 @@ export default function JoinRoom() {
     };
 
     return (
-        <div className="h-screen w-screen flex items-center justify-center bg-black text-white">
+        <div className="fixed inset-0 overflow-auto flex items-center justify-center bg-black text-white">
             <div className="bg-zinc-900 p-6 rounded w-80 space-y-4">
                 <h1 className="text-xl font-bold text-center">
                     Collaborative Code Editor
