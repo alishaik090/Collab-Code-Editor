@@ -19,7 +19,7 @@ The system integrates WebSocket-based synchronization, room-based collaboration,
 ## 🌐 Live Demo
 
 Access the deployed application here:  
-👉 editor09.netlify.app/
+👉 https://editor09.netlify.app/
 
 ---
 
