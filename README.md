@@ -48,12 +48,12 @@ Access the deployed application here:
 
 ### 🏠 Room Creation
 <p align="center">
-  <img src="assets/home.png" alt="Room Creation" width="700"/>
+  <img src="home.jpeg" alt="Room Creation" width="700"/>
 </p>
 
 ### 💻 Collaborative Editor
 <p align="center">
-  <img src="assets/editor.png" alt="Editor" width="700"/>
+  <img src="editor.jpeg" alt="Editor" width="700"/>
 </p>
 
 ---
